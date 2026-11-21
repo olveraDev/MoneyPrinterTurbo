@@ -1360,6 +1360,11 @@ def create_edge_tts_communicate(
     if "boundary" in communicate_signature.parameters:
         communicate_kwargs["boundary"] = "WordBoundary"
 
+    # edge_tts uses aiohttp, which ignores HTTPS_PROXY unless passed explicitly.
+    env_proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
+    if env_proxy and "proxy" in communicate_signature.parameters:
+        communicate_kwargs["proxy"] = env_proxy
+
     # Pass those voices in the full form that edge-tts sends for every voice.
     script_subtag_voice = _EDGE_SCRIPT_SUBTAG_VOICE.match(voice_name)
     if script_subtag_voice:
